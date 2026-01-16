@@ -2,26 +2,24 @@
 
 AUDIO_FILE="audio.wav"
 
-VERSION_CURRENT="0.6"
+VERSION_CURRENT="0.8"
 
 PORT="9999"
 IP_SERVER="localhost"
 
 clear
 
-
 echo "Cliente del protocolo RECTP v$VERSION_CURRENT"
 
 echo "1. SEND. Enviamos la cabecera al servidor"
 
 IP_LOCAL=`ip -4 addr | grep "scope global" | awk '{print $2}' | cut -d "/" -f 1`
-# IP_LOCAL=`ip route get 1 | awk '{print $7}'`
-# IP_LOCAL=`ip -4 addr | grep "scope global" | sed 's/^[ \t]*//' | cut -d "/" -f 1 | cut -d " " -f 2`
-# IP_LOCAL=`ip -4 addr | grep "scope global" | tr -s " " | cut -d " " -f 3 | cut -d "/" -f 1`
-# IP_LOCAL=`ip -4 addr | grep 'inet ' | grep -v '127.' | awk '{print $2}' | cut -d "/" -f ip -4 addr | grep 'inet ' | grep -v '127.' | awk '{print $2}' | cut -d "/" -f 11`
 
 sleep 1
-echo "RECTP $VERSION_CURRENT $IP_LOCAL" | nc $IP_SERVER -q 0 $PORT
+
+IP_LOCAL_HASH=`echo "$IP_LOCAL" | md5sum - | cut -d " " -f 1`
+
+echo "RECTP $VERSION_CURRENT $IP_LOCAL $IP_LOCAL_HASH" | nc $IP_SERVER -q 0 $PORT
 
 RESPONSE=`nc -l -p $PORT`
 
@@ -36,8 +34,10 @@ fi
 
 echo "6. SEND. Nombre de archivo"
 
+FILE_NAME_HASH=`echo "$AUDIO_FILE" | md5sum - | cut -d " " -f 1`
+
 sleep 1
-echo "FILE_NAME $AUDIO_FILE" | nc $IP_SERVER -q 0 $PORT
+echo "FILE_NAME $AUDIO_FILE $FILE_NAME_HASH" | nc $IP_SERVER -q 0 $PORT
 
 echo "7. LISTEN. FILE_NAME_OK"
 

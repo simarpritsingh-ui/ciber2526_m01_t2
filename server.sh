@@ -1,6 +1,6 @@
 #/bin/bash
 
-VERSION_CURRENT="0.6"
+VERSION_CURRENT="0.8"
 
 PORT="9999"
 IP_CLIENT="localhost"
@@ -52,11 +52,18 @@ if [ "$IP_CLIENT" == "" ]
 then
 	echo "Error 4: IP de cliente mal formada ($IP_CLIENT)"
 
-	exit 4
-fi
 
-
-
+IP_CLIENT_HASH=`echo $DATA | cut -d " " -f 4`
+ 
+IP_CLIENT_HASH_TEST=`echo "IP_CLIENT" | md5sum | cut -d " " -f 1`
+ 
+ if [ "$IP_CLIENT_HASH" != "IP_CLIENT_HASH_TEST" ]
+ 
+  then
+ 
+     echo "Error 5: IP de cliente mal formada (wrong hash)"
+     exit 5
+  fi
 
 
 echo "3.2. RESPONSE. Enviando HEADER_OK"
@@ -84,9 +91,23 @@ then
 	exit 3
 fi
 
+
 FILE_NAME=`echo $DATA | cut -d " " -f 2`
 
 echo "File Name: $FILE_NAME"
+
+
+FILE_NAME_HASH=`echo $DATA | cut -d " " -f 3`
+
+FILE_NAME_HASH_TEST=`echo "$FILE_NAME_HASH" | md5sum | cut -d " " -f 1`
+ 
+  if [ "$FILE_NAME_HASH" != "FILE_NAME_HASH_TEST" ]
+ 
+    then
+ 
+      echo "Error 6: error in file name (wrong hash)"
+      exit 6
+fi
 
 echo "8.2 RESPONSE FILE_NAME_OK"
 
@@ -108,4 +129,3 @@ echo "Fin de comunicación"
 aplay $SERVER_DIR/$FILE_NAME
 
 exit 0
-
