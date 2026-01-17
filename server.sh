@@ -52,12 +52,13 @@ if [ "$IP_CLIENT" == "" ]
 then
 	echo "Error 4: IP de cliente mal formada ($IP_CLIENT)"
 
+fi
 
 IP_CLIENT_HASH=`echo $DATA | cut -d " " -f 4`
  
-IP_CLIENT_HASH_TEST=`echo "IP_CLIENT" | md5sum | cut -d " " -f 1`
+IP_CLIENT_HASH_TEST=`echo "$IP_CLIENT" | md5sum | cut -d " " -f 1`
  
- if [ "$IP_CLIENT_HASH" != "IP_CLIENT_HASH_TEST" ]
+ if [ "$IP_CLIENT_HASH" != "$IP_CLIENT_HASH_TEST" ]
  
   then
  
@@ -96,12 +97,11 @@ FILE_NAME=`echo $DATA | cut -d " " -f 2`
 
 echo "File Name: $FILE_NAME"
 
-
 FILE_NAME_HASH=`echo $DATA | cut -d " " -f 3`
 
-FILE_NAME_HASH_TEST=`echo "$FILE_NAME_HASH" | md5sum | cut -d " " -f 1`
+FILE_NAME_HASH_TEST=`echo "$FILE_NAME" | md5sum | cut -d " " -f 1`
  
-  if [ "$FILE_NAME_HASH" != "FILE_NAME_HASH_TEST" ]
+  if [ "$FILE_NAME_HASH" != "$FILE_NAME_HASH_TEST" ]
  
     then
  
@@ -124,8 +124,14 @@ echo "14. SEND. FILE_DATA_OK"
 sleep 1
 echo "FILE_DATA_OK" | nc $IP_CLIENT -q 0 $PORT
 
-echo "Fin de comunicación"
+
+echo "TESTING FILE CONTENT"
+
+FILE_PATH=`$SERVER_DIR/$FILE_NAME`
+
+
 
 aplay $SERVER_DIR/$FILE_NAME
 
+echo "Fin de comunicación"
 exit 0

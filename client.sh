@@ -69,6 +69,20 @@ then
 	exit 3
 fi
 
+RESPONSE=`nc -l -p $PORT`
+
+echo "SENDING FILE CONTENT HASH"
+
+
+
+echo "LISTEN - FILE CONTENT OK"
+
+if [ "$RESPONSE" == "FILE_CONTENT_KO" ]
+then 
+	echo "Error : problem in file content recived"
+
+fi
+
 echo "Fin de comuniación"
 
 exit 0
