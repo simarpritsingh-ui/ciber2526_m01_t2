@@ -129,9 +129,13 @@ echo "TESTING FILE CONTENT"
 
 FILE_PATH=`$SERVER_DIR/$FILE_NAME`
 
+FILE_PATH_HASH=`echo "$SERVER_DIR/$FILE_NAME" | md5sum | cut -d " " -f 1`
+
+echo "SEND FILE CONTENT OK"
+
+echo "FILE_CONTENT_OK" | nc $IP_CLIENT -q 0 $PORT
 
 
 aplay $SERVER_DIR/$FILE_NAME
-
 echo "Fin de comunicación"
 exit 0

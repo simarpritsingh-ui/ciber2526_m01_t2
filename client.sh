@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/b0n/bash
 
 AUDIO_FILE="audio.wav"
 
@@ -23,7 +23,7 @@ echo "RECTP $VERSION_CURRENT $IP_LOCAL $IP_LOCAL_HASH" | nc $IP_SERVER -q 0 $POR
 
 RESPONSE=`nc -l -p $PORT`
 
-echo "5. TEST. Header Response"
+echo "2. TEST. Header Response"
 
 if [ "$RESPONSE" != "HEADER_OK" ]
 then
@@ -32,14 +32,14 @@ then
 	exit 1
 fi
 
-echo "6. SEND. Nombre de archivo"
+echo "2. SEND. FILE NAME"
 
 FILE_NAME_HASH=`echo "$AUDIO_FILE" | md5sum - | cut -d " " -f 1`
 
 sleep 1
 echo "FILE_NAME $AUDIO_FILE $FILE_NAME_HASH" | nc $IP_SERVER -q 0 $PORT
 
-echo "7. LISTEN. FILE_NAME_OK"
+echo "3. LISTEN. FILE_NAME_OK"
 
 RESPONSE=`nc -l -p $PORT`
 
@@ -54,13 +54,11 @@ fi
 echo "11. SEND. FILE DATA"
 
 sleep 1
-cat audio.wav | nc $IP_SERVER -q 0 $PORT
 
-echo "12. LISTEN"
+cat audio.wav | nc $IP_SERVER -q 0  $PORT
+echo "15. TEST FILE DATA OK"
 
 RESPONSE=`nc -l -p $PORT`
-
-echo "15. TEST AND END"
 
 if [ "$RESPONSE" != "FILE_DATA_OK" ]
 then
@@ -73,7 +71,9 @@ RESPONSE=`nc -l -p $PORT`
 
 echo "SENDING FILE CONTENT HASH"
 
+FILE_CONTENT_HASH=`audio.wav | m5dsum | cut -d " " -f 1`
 
+echo "$FILE_CONTENT_HASH" | nc $IP_SERVER -q 0  $PORT
 
 echo "LISTEN - FILE CONTENT OK"
 
