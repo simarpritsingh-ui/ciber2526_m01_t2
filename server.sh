@@ -1,6 +1,6 @@
 #/bin/bash
 
-VERSION_CURRENT="0.8"
+VERSION_CURRENT="0.9"
 
 PORT="9999"
 IP_CLIENT="localhost"
@@ -74,8 +74,8 @@ echo "HEADER_OK" | nc $IP_CLIENT -q 0 $PORT
 
 echo "4. LISTEN. Nombre de archivo"
 
-DATA=`nc -l -p $PORT`
 
+DATA=`nc -l -p $PORT`
 echo "8. FILE NAME"
 
 echo "8.1 TEST"
@@ -129,12 +129,29 @@ echo "TESTING FILE CONTENT"
 
 FILE_PATH=`$SERVER_DIR/$FILE_NAME`
 
-FILE_PATH_HASH=`echo "$SERVER_DIR/$FILE_NAME" | md5sum | cut -d " " -f 1`
+FILE_PATH_HASH=`md5sum "$SERVER_DIR/$FILE_NAME" | cut -d " " -f 1`
 
-echo "SEND FILE CONTENT OK"
+echo "SEND FILE_HASH_OK"
+sleep 1
 
-echo "FILE_CONTENT_OK" | nc $IP_CLIENT -q 0 $PORT
+# Wrap the listener in a loop so it doesn't close after the first check
+while true; do
+    FILE_HASH_SENT=`nc -l $PORT`
 
+	if [ "$FILE_HASH_SENT" != "$FILE_PATH_HASH"  ]
+	then
+
+		echo "Error 7: problem in hash recived from client"
+
+		echo "FILE_CONTENT_KO" | nc $IP_CLIENT -q 0 $PORT
+
+	else
+
+		echo "FILE_CONTENT_OK" | nc $IP_CLIENT -q 0 $PORT
+
+fi
+
+done
 
 aplay $SERVER_DIR/$FILE_NAME
 echo "Fin de comunicación"

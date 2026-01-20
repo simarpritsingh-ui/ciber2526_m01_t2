@@ -1,8 +1,8 @@
-#!/b0n/bash
+#!/bin/bash
 
 AUDIO_FILE="audio.wav"
 
-VERSION_CURRENT="0.8"
+VERSION_CURRENT="0.9"
 
 PORT="9999"
 IP_SERVER="localhost"
@@ -67,17 +67,25 @@ then
 	exit 3
 fi
 
-RESPONSE=`nc -l -p $PORT`
 
 echo "SENDING FILE CONTENT HASH"
+sleep 1
 
-FILE_CONTENT_HASH=`audio.wav | m5dsum | cut -d " " -f 1`
+FILE_CONTENT_HASH=`md5sum audio.wav | cut -d " " -f 1`
+
+
+until echo "$FILE_CONTENT_HASH" | nc $IP_SERVER $PORT; do
+  echo "Server not ready yet, retrying..."
+  sleep 1
+done
 
 echo "$FILE_CONTENT_HASH" | nc $IP_SERVER -q 0  $PORT
 
-echo "LISTEN - FILE CONTENT OK"
+RESPONSE=`nc -l -p $PORT`
 
-if [ "$RESPONSE" == "FILE_CONTENT_KO" ]
+echo "LISTEN - FILE HASH OK"
+
+if [ "$RESPONSE" == "FILE_HASH_KO" ]
 then 
 	echo "Error : problem in file content recived"
 
