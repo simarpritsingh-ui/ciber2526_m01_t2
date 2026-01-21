@@ -68,28 +68,24 @@ then
 fi
 
 
-echo "SENDING FILE CONTENT HASH"
+echo "SEND. FILE CONTENT HASH"
 sleep 1
 
 FILE_CONTENT_HASH=`md5sum audio.wav | cut -d " " -f 1`
-
-
-until echo "$FILE_CONTENT_HASH" | nc $IP_SERVER $PORT; do
-  echo "Server not ready yet, retrying..."
-  sleep 1
-done
 
 echo "$FILE_CONTENT_HASH" | nc $IP_SERVER -q 0  $PORT
 
 RESPONSE=`nc -l -p $PORT`
 
-echo "LISTEN - FILE HASH OK"
+echo "TEST  - FILE HASH OK"
 
 if [ "$RESPONSE" == "FILE_HASH_KO" ]
 then 
-	echo "Error : problem in file content recived"
+	echo "Error : problem in file content recived by server"
 
 fi
+
+echo " $FILE_CONTENT_HASH"
 
 echo "Fin de comuniación"
 
