@@ -61,7 +61,8 @@ if [ $ERROR_RECTP -gt 0 ]
 then
 	echo -e "\e[0;30;41mError $ERROR_RECTP al enviar el archivo.\e[0m"
 
-	FECHA=`date`
+  FECHA=`date +"%Y-%m-%d %H:%M:%S"`
+	
 
 	echo "$ERROR_RECTP $FECHA" >> rectp_sender.log
 fi
