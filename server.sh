@@ -124,34 +124,31 @@ echo "14. SEND. FILE_DATA_OK"
 sleep 1
 echo "FILE_DATA_OK" | nc $IP_CLIENT -q 0 $PORT
 
-
 echo "TESTING FILE CONTENT"
 
-FILE_PATH=`$SERVER_DIR/$FILE_NAME`
+FILE_PATH="$SERVER_DIR/$FILE_NAME"
 
-FILE_PATH_HASH=`md5sum "$SERVER_DIR/$FILE_NAME" | cut -d " " -f 1`
+FILE_PATH_HASH=`md5sum "$FILE_PATH" | cut -d " " -f 1`
+
+
+echo "$FILE_PATH_HASH"
 
 echo "SEND FILE_HASH_OK"
 sleep 1
 
-# Wrap the listener in a loop so it doesn't close after the first check
-while true; do
-    FILE_HASH_SENT=`nc -l $PORT`
+FILE_HASH_RECIVED=`nc -l -p  $PORT`
 
-	if [ "$FILE_HASH_SENT" != "$FILE_PATH_HASH"  ]
-	then
+if [ "$FILE_HASH_RECIVED" != "$FILE_PATH_HASH"  ]
+then
 
-		echo "Error 7: problem in hash recived from client"
+	echo "Error 7: problem in hash recived from client"
+	echo "FILE_CONTENT_KO" | nc $IP_CLIENT -q 0 $PORT
 
-		echo "FILE_CONTENT_KO" | nc $IP_CLIENT -q 0 $PORT
-
-	else
-
-		echo "FILE_CONTENT_OK" | nc $IP_CLIENT -q 0 $PORT
+else
+	echo "FILE_CONTENT_OK" | nc $IP_CLIENT -q 0 $PORT
 
 fi
 
-done
 
 aplay $SERVER_DIR/$FILE_NAME
 echo "Fin de comunicación"
