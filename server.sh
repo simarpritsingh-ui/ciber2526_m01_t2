@@ -67,18 +67,18 @@ IP_CLIENT_HASH_TEST=`echo "$IP_CLIENT" | md5sum | cut -d " " -f 1`
   fi
 
 
-echo "3.2. RESPONSE. Enviando HEADER_OK"
+echo "2. RESPONSE. Sending HEADER_OK"
 
 sleep 1
 echo "HEADER_OK" | nc $IP_CLIENT -q 0 $PORT
 
-echo "5. LISTEN. Nombre de archivo"
+echo "3. LISTEN. FILE NAME"
 
 
 DATA=`nc -l -p $PORT`
-echo "6. FILE NAME"
+echo "4. FILE NAME"
 
-echo "7. TEST"
+echo "5. TEST File Prefix"
 
 FILE_NAME_PREFIX=`echo $DATA | cut -d " " -f 1`
 
@@ -95,7 +95,7 @@ fi
 
 FILE_NAME=`echo $DATA | cut -d " " -f 2`
 
-echo "8.FILE NAME: $FILE_NAME"
+echo "6.FILE NAME: $FILE_NAME"
 
 FILE_NAME_HASH=`echo $DATA | cut -d " " -f 3`
 
@@ -109,33 +109,28 @@ FILE_NAME_HASH_TEST=`echo "$FILE_NAME" | md5sum | cut -d " " -f 1`
       exit 6
 fi
 
-echo "8.2 RESPONSE FILE_NAME_OK"
+echo "7. RESPONSE FILE_NAME_OK"
 
 sleep 1
 echo "FILE_NAME_OK" | nc $IP_CLIENT -q 0 $PORT
 
-echo "9. LISTEN FILE DATA"
-
-echo "10. STORE FILE DATA"
+echo "7.1. STORE FILE DATA"
 
 nc -l -p $PORT > $SERVER_DIR/$FILE_NAME
 
-echo "11. SEND. FILE_DATA_OK"
-
+echo "7.2. SEND. FILE_DATA_OK"
 sleep 1
+
 echo "FILE_DATA_OK" | nc $IP_CLIENT -q 0 $PORT
 
-echo "TESTING FILE CONTENT"
+echo "7.3 TESTING FILE CONTENT"
 
 FILE_PATH="$SERVER_DIR/$FILE_NAME"
 
 FILE_PATH_HASH=`md5sum "$FILE_PATH" | cut -d " " -f 1`
 
 
-echo "$FILE_PATH_HASH"
-
-echo "SEND FILE_HASH_OK"
-sleep 1
+echo "8.SEND FILE_HASH_OK"
 
 FILE_HASH_RECEIVED=`nc -l -p  $PORT`
 
@@ -144,15 +139,43 @@ then
 	echo "Error 7: problem in hash received from client"
 
 	echo "FILE_CONTENT_KO" | nc $IP_CLIENT -q 0 $PORT
+
 else
 
-do
-	echo "FILE_CONTENT_KO" | nc -w 1 $IP_CLIENT -q 0 $PORT
+	echo "FILE_CONTENT_OK" | nc -w 1 $IP_CLIENT -q 0 $PORT
 
-done
 fi
 
 
 aplay $SERVER_DIR/$FILE_NAME
+
+
 echo "End of comunication"
+
+SERVER="127.0.0.1"
+:EMAIL_PORT=25
+FROM="root@simar.enti"
+TO="enti@simar.enti"
+SUBJECT="File Recieved!"
+BODY="File recieved from RECTP!"
+
+{
+  sleep 2	
+  echo "HELO simar.enti"
+  sleep 2
+  echo "MAIL FROM: <$FROM>"
+  sleep 2
+  echo "RCPT TO: <$TO>"
+  sleep 2
+  echo "DATA"
+  sleep 1
+  echo "Subject: $SUBJECT"
+  echo ""
+  echo "$BODY"
+  echo "."
+  sleep 1
+  echo "QUIT"
+} | nc $SERVER $EMAIL_PORT
+
 exit 0
+
